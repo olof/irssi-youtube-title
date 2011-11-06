@@ -18,6 +18,9 @@ use Regexp::Common qw/URI/;
 my $VERSION = '0.52';
 
 # changelog:
+# 0.54, 2011-11-06:
+#   * Oops. With 0.53 the script will try to fetch title for
+#     every link. Fixed now.
 # 0.53, 2011-11-06:
 #   * Support new domain hack "youtu.be"
 #   * Whitelist invalid characters instead of blacklisting
@@ -113,10 +116,12 @@ sub get_ids {
 
 		if($uri->host =~ /^(?:www\.)?youtube\.com$/) {
 			next unless $uri->path eq '/watch';
-			next unless $id = $uri->query_param('v');
+			$id = $uri->query_param('v');
 		} elsif($uri->host =~ /^(?:www\.)?youtu\.be$/) {
-			next unless ($id) = $uri->path =~ m;/(.*);
+			($id) = $uri->path =~ m;/(.*);
 		}
+		
+		next unless $id;
 
 		$id =~ s/[^\w-].*//;
 		push @ids, $id;
