@@ -149,14 +149,11 @@ has_ids(
 	'youtu.be uri delimieted by ,'
 );
 
-TODO: {
-	local $TODO = 'Olof is investigating... :-)';
-	has_ids(
-		sprintf("%s, :D", https_www_youtube_com('ASdf78A-')),
-		['ASdf78A'],
-		'youtu.be uri with a trailing -'
-	);
-}
+has_ids(
+	sprintf("%s, :D", https_www_youtube_com('ASdf78A-')),
+	['ASdf78A-'],
+	'youtu.be uri with a trailing -'
+);
 
 has_ids(
 	sprintf("%s, :D", https_www_youtube_com('AS-df_78A')),
