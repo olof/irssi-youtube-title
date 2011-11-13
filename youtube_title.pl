@@ -77,7 +77,7 @@ sub idextr_youtube_com {
 sub idextr_youtu_be { (URI->new(shift)->path =~ m;/(.*);)[0] }
 
 sub id_from_uri {
-	my $uri = shift;
+	my $uri = URI->new(shift);
 	my $domain = canon_domain($uri->host);
 
 	my %domains = (
@@ -95,16 +95,7 @@ sub get_ids {
 	my @ids;
 
 	foreach($msg =~ /$re_uri/g) {
-		my $uri = URI->new($_);
-		my $id;
-
-		if($uri->host =~ /^(?:www\.)?youtube\.com$/) {
-			next unless $uri->path eq '/watch';
-			$id = $uri->query_param('v');
-		} elsif($uri->host =~ /^(?:www\.)?youtu\.be$/) {
-			($id) = $uri->path =~ m;/(.*);
-		}
-		
+		my $id = id_from_uri($_);
 		next unless $id;
 
 		$id =~ s/[^\w-].*//;
