@@ -54,22 +54,48 @@ sub process {
 	}
 }
 
+sub canon_domain {
+	my $domain = normalize_domain(shift);
+
+	{
+		'youtube.com' => 'youtube.com',
+		'youtu.be' => 'youtu.be',
+	}->{$domain};
+}
+
+sub normalize_domain {
+	my $_ = shift;
+	s/^www\.//;
+	return $_;
+}
+
+sub idextr_youtube_com {
+	my $u = URI->new(shift);
+	return $u->query_param('v') if $u->path eq '/watch';
+}
+
+sub idextr_youtu_be { (URI->new(shift)->path =~ m;/(.*);)[0] }
+
+sub id_from_uri {
+	my $uri = URI->new(shift);
+	my $domain = canon_domain($uri->host);
+
+	my %domains = (
+		'youtube.com' => \&idextr_youtube_com,
+		'youtu.be' => \&idextr_youtu_be,
+	);
+
+	return $domains{$domain}->($uri) if ref $domains{$domain} eq 'CODE';
+	# TODO warn somehow if you reach this point and $domains{$domain}?
+}
+
 sub get_ids {
 	my $msg = shift;
 	my $re_uri = qr#$RE{URI}{HTTP}{-scheme=>'https?'}#;
 	my @ids;
 
 	foreach($msg =~ /$re_uri/g) {
-		my $uri = URI->new($_);
-		my $id;
-
-		if($uri->host =~ /^(?:www\.)?youtube\.com$/) {
-			next unless $uri->path eq '/watch';
-			$id = $uri->query_param('v');
-		} elsif($uri->host =~ /^(?:www\.)?youtu\.be$/) {
-			($id) = $uri->path =~ m;/(.*);
-		}
-		
+		my $id = id_from_uri($_);
 		next unless $id;
 
 		$id =~ s/[^\w-].*//;
