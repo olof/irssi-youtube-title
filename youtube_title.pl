@@ -105,6 +105,21 @@ sub process {
 	}
 }
 
+sub is_valid_domain {
+	my $domain = normalize_domain(shift);
+
+	{
+		'youtube.com' => 'youtube_com',
+		'youtu_be' => 'youtu_be',
+	}->{$domain};
+}
+
+sub normalize_domain {
+	my $_ = shift;
+	s/^www\.//;
+	return $_;
+}
+
 sub get_ids {
 	my $msg = shift;
 	my $re_uri = qr#$RE{URI}{HTTP}{-scheme=>'https?'}#;
