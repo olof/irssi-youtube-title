@@ -120,11 +120,20 @@ sub normalize_domain {
 	return $_;
 }
 
+sub idextr_youtube_com {
+	my $u = URI->new(shift);
+	return $u->query_param('v') if $u->path eq '/watch';
+}
+
+sub idextr_youtu_be { (URI->new(shift)->path =~ m;/(.*);)[0] }
+
 sub id_from_uri {
 	my $uri = shift;
 	my $domain = canon_domain($uri->host);
 
 	my %domains = (
+		'youtube.com' => \&idextr_youtube_com,
+		'youtu.be' => \&idextr_youtu_be,
 	);
 
 	return $domains{$domain}->($uri) if ref $domains{$domain} eq 'CODE';
