@@ -109,8 +109,8 @@ sub canon_domain {
 	my $domain = normalize_domain(shift);
 
 	{
-		'youtube.com' => 'youtube_com',
-		'youtu.be' => 'youtu_be',
+		'youtube.com' => 'youtube.com',
+		'youtu.be' => 'youtu.be',
 	}->{$domain};
 }
 
