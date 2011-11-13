@@ -120,6 +120,17 @@ sub normalize_domain {
 	return $_;
 }
 
+sub id_from_uri {
+	my $uri = shift;
+	my $domain = canon_domain($uri->host);
+
+	my %domains = (
+	);
+
+	return $domains{$domain}->($uri) if ref $domains{$domain} eq 'CODE';
+	# TODO warn somehow if you reach this point and $domains{$domain}?
+}
+
 sub get_ids {
 	my $msg = shift;
 	my $re_uri = qr#$RE{URI}{HTTP}{-scheme=>'https?'}#;
