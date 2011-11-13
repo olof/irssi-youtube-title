@@ -105,7 +105,7 @@ sub process {
 	}
 }
 
-sub is_valid_domain {
+sub canon_domain {
 	my $domain = normalize_domain(shift);
 
 	{

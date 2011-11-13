@@ -7,7 +7,7 @@ use strict;
 use lib qw;t/lib;;
 use Test::More tests => 6;
 
-sub f { main::is_valid_domain(@_) } # short alias
+sub f { main::canon_domain(@_) } # short alias
 
 is(f('youtube.com'), 'youtube_com', 'validity of youtube.com');
 is(f('www.youtube.com'), 'youtube_com', 'validity of www.youtube.com');
