@@ -15,16 +15,19 @@ use URI;
 use URI::QueryParam;
 use Regexp::Common qw/URI/;
 
-my $VERSION = '0.52';
+my $VERSION = '0.6';
 
 my %IRSSI = (
 	authors     => 'Olof \'zibri\' Johansson',
 	contact     => 'olof@ethup.se',
 	name        => 'youtube-title',
+	uri         => 'https://github.com/olof/irssi-youtube-title',
 	description => 'prints the title of a youtube video automatically',
 	license     => 'GNU APL',
 );
 
+# Changelog is now available as a separate file (./Changes). If you
+# don't have it, you can find it on github.
 Irssi::settings_add_bool('youtube_title', 'yt_print_own', 0);
 
 sub callback {

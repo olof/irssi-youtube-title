@@ -1,3 +1,10 @@
+0.6, 2011-11-13:
+  * Refactoring of get_ids (extracting ID from URI)
+  * Unit testing get_ids and assoicated functions
+  * Breaking out this changelog into separate file
+
+ [ n.b. release 0.53 and 0.54 didn't increment the $VERSION
+        variable defined in the script. ]
 0.54, 2011-11-06:
   * Oops. With 0.53 the script will try to fetch title for
     every link. Fixed now.
