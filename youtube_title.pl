@@ -110,7 +110,7 @@ sub is_valid_domain {
 
 	{
 		'youtube.com' => 'youtube_com',
-		'youtu_be' => 'youtu_be',
+		'youtu.be' => 'youtu_be',
 	}->{$domain};
 }
 
