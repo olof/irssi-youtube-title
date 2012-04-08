@@ -147,8 +147,8 @@ sub get_title {
 
 sub print_error {
 	my ($server, $target, $msg) = @_;
-	$server->window_item_find($target)->print(
-		"%rError fetching youtube title:%n $msg", MSGLEVEL_CLIENTCRAP
+	$server->window_item_find($target)->printformat(
+		MSGLEVEL_CLIENTCRAP, 'yt_error', $msg
 	);
 }
 
@@ -158,10 +158,15 @@ sub print_title {
 	$title = decode_entities($title);
 	$d = decode_entities($d);
 
-	$server->window_item_find($target)->print(
-		"%yyoutube:%n $title ($d)", MSGLEVEL_CLIENTCRAP
+	$server->window_item_find($target)->printformat(
+		MSGLEVEL_CLIENTCRAP, 'yt_ok', $title, $d
 	);
 }
+
+Irssi::theme_register([
+	'yt_ok', '%yyoutube:%n $0 ($1)',
+	'yt_error', '%rError fetching youtube title:%n $0',
+]);
 
 Irssi::signal_add("message public", \&callback);
 Irssi::signal_add("message private", \&callback);

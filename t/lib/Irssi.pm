@@ -15,4 +15,6 @@ sub settings_get_bool {
 	return $settings->{$k}
 }
 
+sub theme_register { 1 }
+
 1;
