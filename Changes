@@ -1,3 +1,10 @@
+0.7, 2012-04-09:
+  * Use Irssi formats for output, see
+    - /format yt_ok
+    - /format yt_error
+  * Unit test for verifying matching version number
+    in script and changelog.
+  * Starting to use annotated tags in git
 0.6, 2011-11-13:
   * Refactoring of get_ids (extracting ID from URI)
   * Unit testing get_ids and assoicated functions

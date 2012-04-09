@@ -15,7 +15,7 @@ use URI;
 use URI::QueryParam;
 use Regexp::Common qw/URI/;
 
-my $VERSION = '0.6';
+my $VERSION = '0.7';
 
 my %IRSSI = (
 	authors     => 'Olof "zibri" Johansson',
