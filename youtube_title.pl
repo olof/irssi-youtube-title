@@ -18,7 +18,7 @@ use Regexp::Common qw/URI/;
 my $VERSION = '0.6';
 
 my %IRSSI = (
-	authors     => 'Olof \'zibri\' Johansson',
+	authors     => 'Olof "zibri" Johansson',
 	contact     => 'olof@ethup.se',
 	name        => 'youtube-title',
 	uri         => 'https://github.com/olof/irssi-youtube-title',
