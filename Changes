@@ -1,3 +1,5 @@
+0.8, 2014-04-05:
+  * The script now uses Youtube API v3 since v2 has been deprecated. It is now required that each user generates a personal API key from Google to use the script.
 0.7, 2012-04-09:
   * Use Irssi formats for output, see
     - /format yt_ok
