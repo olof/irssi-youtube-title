@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2009 -- 2011, Olof Johansson <olof@ethup.se>
+# Copyright 2009 -- 2014, Olof Johansson <olof@ethup.se>, DrThum <thum@drthum.net>
 #
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
@@ -9,16 +9,16 @@
 use strict;
 use Irssi;
 use LWP::UserAgent;
-use XML::Simple;
 use HTML::Entities;
+use JSON qw( decode_json );
 use URI;
 use URI::QueryParam;
 use Regexp::Common qw/URI/;
 
-my $VERSION = '0.7';
+my $VERSION = '0.8';
 
 my %IRSSI = (
-	authors     => 'Olof "zibri" Johansson',
+	authors     => 'Olof "zibri" Johansson, DrThum',
 	contact     => 'olof@ethup.se',
 	name        => 'youtube-title',
 	uri         => 'https://github.com/olof/irssi-youtube-title',
@@ -28,7 +28,8 @@ my %IRSSI = (
 
 # Changelog is now available as a separate file (./Changes). If you
 # don't have it, you can find it on github.
-Irssi::settings_add_bool('youtube_title', 'yt_print_own', 0);
+Irssi::settings_add_bool('youtube_title', 'yt_print_own', 0); # Whether to print the title for your own youtube links
+Irssi::settings_add_str('youtube_title', 'yt_api_key', ''); # User's personal Google API key
 
 sub callback {
 	my($server, $msg, $nick, $address, $target) = @_;
@@ -108,16 +109,16 @@ sub get_ids {
 	return @ids;
 }
 
-# extract title using youtube api
-# http://code.google.com/apis/youtube/2.0/developers_guide_protocol.html
+# extract title and duration using youtube api v3
 sub get_title {
 	my($vid)=@_;
 
-	my $url = "http://gdata.youtube.com/feeds/api/videos/$vid";
+	my $key = Irssi::settings_get_str('yt_api_key');
+	my $url = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=$vid&fields=items&key=$key";
 	
 	my $ua = LWP::UserAgent->new();
 	$ua->agent("$IRSSI{name}/$VERSION (irssi)");
-	$ua->timeout(3);
+	$ua->timeout(1);
 	$ua->env_proxy;
 
 	my $response = $ua->get($url);
@@ -125,21 +126,23 @@ sub get_title {
 	if($response->code == 200) {
 		my $content = $response->decoded_content;
 
-		my $xml = XMLin($content)->{'media:group'};
-		my $title = $xml->{'media:title'}->{content};
-		my $s = $xml->{'yt:duration'}->{seconds};
-
-		my $m = $s / 60;
-		my $d = sprintf "%d:%02d", $m, $s % 60;
+		my $json = decode_json($content);
+		my @items = @{ $json->{'items'} };
+		my $first = $items[0];
+		my $title = $first->{'snippet'}{'title'};
+		my $duration = $first->{'contentDetails'}{'duration'};
+		$duration =~ s/PT//;
 
 		if($title) {
 			return {
 				title => $title,
-				duration => $d,
+				duration => $duration,
 			};
 		}
 
 		return {error => 'could not find title'};
+	} elsif ($response->code >= 400) {
+		return { error => 'did you setup your API key? /help yt-title for more information.' };	
 	}
 	
 	return {error => $response->message};
@@ -163,8 +166,25 @@ sub print_title {
 	);
 }
 
+sub help_msg {
+	if ($_[0] eq 'yt-title') {
+		my $help = "To use this plugin, you must first set create and set your personal Google API key.
+This is needed because each key is allowed for only specific IP addresses.
+To create your key, go to https://console.developers.google.com/project and create a project. Once
+it's done, go to the newly created project, APIs & auth on the right, and in the APIs tab, ensure that
+YouTube Data API v3 is set to ON (the others don't matter).
+Now, in the Credentials tab, press the Create new key button, and choose the Server key option. In the 
+text area, enter the IP address of the machine hosting your irssi client. Once the key is created, copy
+it and in irssi, run the command /set yt_api_key followed by the key.
+Congratulations, you should now be able to use this script!";
+
+		Irssi::print($help, MSGLEVEL_CLIENTCRAP);
+		Irssi::signal_stop;
+	}
+}
+
 Irssi::theme_register([
-	'yt_ok', '%yyoutube:%n $0 ($1)',
+	'yt_ok', '%yYoutube:%n $0 ($1)',
 	'yt_error', '%rError fetching youtube title:%n $0',
 ]);
 
@@ -174,3 +194,4 @@ Irssi::signal_add("message private", \&callback);
 Irssi::signal_add("message own_public", \&own_callback);
 Irssi::signal_add("message own_private", \&own_callback);
 
+Irssi::command_bind('help', 'help_msg');
