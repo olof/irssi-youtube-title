@@ -67,9 +67,9 @@ sub canon_domain {
 }
 
 sub normalize_domain {
-	my $_ = shift;
-	s/^www\.//;
-	return $_;
+	my $domain = shift;
+	$domain =~ s/^www\.//;
+	return $domain;
 }
 
 sub idextr_youtube_com {
