@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2009 -- 2011, Olof Johansson <olof@ethup.se>
+# Copyright 2009-2012, 2014: Olof Johansson <olof@ethup.se>
 #
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
@@ -15,7 +15,7 @@ use URI;
 use URI::QueryParam;
 use Regexp::Common qw/URI/;
 
-my $VERSION = '0.7';
+my $VERSION = '0.71';
 
 my %IRSSI = (
 	authors     => 'Olof "zibri" Johansson',

@@ -1,3 +1,7 @@
+0.71, 2014-04-05:
+  [Minor tweaks & bugs]
+  * Fix Perl warning about my $_ being experimental
+  * Use prove program for running unittests
 0.7, 2012-04-09:
   * Use Irssi formats for output, see
     - /format yt_ok
