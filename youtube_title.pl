@@ -35,13 +35,13 @@ sub callback {
 	$target=$nick if $target eq undef;
 
 	# process each youtube link in message
-	process($server, $target, $_) for (get_ids($msg)); 
+	process($server, $target, $_) for (get_ids($msg));
 }
 
 sub own_callback {
 	my($server, $msg, $target) = @_;
 
-	if(Irssi::settings_get_bool('yt_print_own')) { 
+	if(Irssi::settings_get_bool('yt_print_own')) {
 		callback($server, $msg, undef, undef, $target);
 	}
 }
@@ -49,7 +49,7 @@ sub own_callback {
 sub process {
 	my ($server, $target, $id) = @_;
 	my $yt = get_title($id);
-		
+
 	if(exists $yt->{error}) {
 		print_error($server, $target, $yt->{error});
 	} else {
@@ -114,7 +114,7 @@ sub get_title {
 	my($vid)=@_;
 
 	my $url = "http://gdata.youtube.com/feeds/api/videos/$vid";
-	
+
 	my $ua = LWP::UserAgent->new();
 	$ua->agent("$IRSSI{name}/$VERSION (irssi)");
 	$ua->timeout(3);
@@ -141,7 +141,7 @@ sub get_title {
 
 		return {error => 'could not find title'};
 	}
-	
+
 	return {error => $response->message};
 }
 
@@ -173,4 +173,3 @@ Irssi::signal_add("message private", \&callback);
 
 Irssi::signal_add("message own_public", \&own_callback);
 Irssi::signal_add("message own_private", \&own_callback);
-
