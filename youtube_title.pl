@@ -108,12 +108,17 @@ sub get_ids {
 	return @ids;
 }
 
-# extract title using youtube api
-# http://code.google.com/apis/youtube/2.0/developers_guide_protocol.html
+# Extract title by scraping. This isn't ideal, but since youtube decided to
+# deprecate their xml based api v2.0, in favor for something requiring
+# registration to even do simple things like fetching metadata info, it
+# seems to be the only viable option.
+#
+# So scraping it is. Thanks youtube.
 sub get_title {
 	my($vid)=@_;
 
-	my $url = "http://gdata.youtube.com/feeds/api/videos/$vid";
+	my $url = "http://youtube.com/watch?v=$vid";
+	#my $url = "http://gdata.youtube.com/feeds/api/videos/$vid";
 
 	my $ua = LWP::UserAgent->new();
 	$ua->agent("$IRSSI{name}/$VERSION (irssi)");
@@ -122,27 +127,36 @@ sub get_title {
 
 	my $response = $ua->get($url);
 
-	if($response->code == 200) {
-		my $content = $response->decoded_content;
+	return {error => $response->message} if $response->code != 200;
 
-		my $xml = XMLin($content)->{'media:group'};
-		my $title = $xml->{'media:title'}->{content};
-		my $s = $xml->{'yt:duration'}->{seconds};
+	my $content = $response->decoded_content;
 
-		my $m = $s / 60;
-		my $d = sprintf "%d:%02d", $m, $s % 60;
+	my ($title) = $content =~ m{<meta name="title" content="([^"]+)">};
+	$title = decode_entities($title);
+	my ($durstr) = $content =~
+		m{<meta itemprop="duration" content="(PT[^"]+)">};
 
-		if($title) {
-			return {
-				title => $title,
-				duration => $d,
-			};
-		}
+	my $d = parse_durstr($durstr);
 
-		return {error => 'could not find title'};
+	if($title) {
+		return {
+			title => $title,
+			duration => $d,
+		};
 	}
 
-	return {error => $response->message};
+	return {error => 'could not find title'};
+}
+
+sub parse_durstr {
+	my $durstr = shift;
+
+	# PT600M1S = 600 minutes,  1 second
+	# PT20M12S =  20 minutes, 12 seconds
+	# PT0M36S  =   0 minutes, 36 seconds
+
+	my ($h, $s) = $durstr =~ /^PT([0-9]+)M([0-9]+S)$/;
+	return sprintf "%d:%02d", $h, $s;
 }
 
 sub print_error {
